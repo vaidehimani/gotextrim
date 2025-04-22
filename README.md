@@ -7,6 +7,28 @@ A lightweight Go utility library for intelligently trimming text strings. This l
 [![license](https://img.shields.io/github/license/vaidehimani/gotextrim)](LICENSE)
 [![Build Status](https://github.com/vaidehimani/gotextrim/workflows/CI/badge.svg)](https://github.com/vaidehimani/gotextrim/actions)
 
+## ⚡ Installation
+
+```bash
+go get github.com/vaidehimani/gotextrim
+```
+
+## 🚀 Usage
+
+```go
+import (
+    "fmt"
+    "github.com/vaidehimani/gotextrim"
+)
+
+func main() {
+    // Basic usage with default options
+    result := trimmer.SmartTrim("This is a long sentence that needs to be trimmed", 20, nil)
+    fmt.Println(result)
+    // Output: "This is a long..."
+}
+```
+
 ## 💡 Examples
 
 ```go
