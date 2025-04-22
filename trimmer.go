@@ -6,8 +6,8 @@ import (
 )
 
 type SmartTrimOptions struct {
-	Suffix string
-	PreserveWholeWords bool
+	Suffix              string
+	PreserveWholeWords  bool
 	PreservePunctuation bool
 }
 
