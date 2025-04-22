@@ -1,8 +1,6 @@
 package trimmer
 
 import (
-	"fmt"
-	"strings"
 	"testing"
 )
 
@@ -61,7 +59,7 @@ func TestSmartTrim(t *testing.T) {
 			},
 			expected: "The quick brown fox...",
 		},
-				{
+		{
 			name:   "Preserve punctuation",
 			text:   "The quick brown fox, jumps over the lazy dog",
 			maxLen: 24,
@@ -142,9 +140,9 @@ func TestSmartTrim(t *testing.T) {
 			expected: "Short text...",
 		},
 		{
-			name:     "Handle no suffix using struct",
-			text:     "Short text",
-			maxLen:   6,
+			name:   "Handle no suffix using struct",
+			text:   "Short text",
+			maxLen: 6,
 			options: &SmartTrimOptions{
 				Suffix:              "",
 				PreserveWholeWords:  true,
@@ -153,9 +151,9 @@ func TestSmartTrim(t *testing.T) {
 			expected: "...",
 		},
 		{
-			name:     "Handle suffix longer than maxlength ",
-			text:     "Short text",
-			maxLen:   3,
+			name:   "Handle suffix longer than maxlength ",
+			text:   "Short text",
+			maxLen: 3,
 			options: &SmartTrimOptions{
 				Suffix:              "more",
 				PreserveWholeWords:  true,
@@ -167,13 +165,13 @@ func TestSmartTrim(t *testing.T) {
 			name:     "trims input containing only whitespace",
 			text:     "          ",
 			maxLen:   3,
-			options: nil,
+			options:  nil,
 			expected: "...",
 		},
 		{
-			name:     "handles string made of only punctuation",
-			text:     "!!!???...",
-			maxLen:   5,
+			name:   "handles string made of only punctuation",
+			text:   "!!!???...",
+			maxLen: 5,
 			options: &SmartTrimOptions{
 				Suffix:              "...",
 				PreserveWholeWords:  true,
@@ -229,7 +227,7 @@ func TestFunctionalOptions(t *testing.T) {
 		t.Errorf("SmartTrim with mixed options = %q, want %q", result, expected)
 	}
 
-		// Test functional option with empty suffix
+	// Test functional option with empty suffix
 	result = SmartTrim(
 		"Short text",
 		6,
@@ -283,62 +281,5 @@ func TestIsPunctuation(t *testing.T) {
 		if isPunctuation(r) {
 			t.Errorf("isPunctuation(%q) = true, want false", r)
 		}
-	}
-}
-
-// Benchmark for SmartTrim function
-func BenchmarkSmartTrim(b *testing.B) {
-	text := "The quick brown fox jumps over the lazy dog. This is a longer text to use for benchmarking the SmartTrim function with various options and configurations."
-
-	b.Run("Default", func(b *testing.B) {
-		for i := 0; i < b.N; i++ {
-			SmartTrim(text, 50, nil)
-		}
-	})
-
-	b.Run("NoPreserveWords", func(b *testing.B) {
-		opts := &SmartTrimOptions{PreserveWholeWords: false}
-		for i := 0; i < b.N; i++ {
-			SmartTrim(text, 50, opts)
-		}
-	})
-
-	b.Run("NoPreservePunctuation", func(b *testing.B) {
-		opts := &SmartTrimOptions{PreservePunctuation: false}
-		for i := 0; i < b.N; i++ {
-			SmartTrim(text, 50, opts)
-		}
-	})
-
-	b.Run("CustomSuffix", func(b *testing.B) {
-		opts := &SmartTrimOptions{Suffix: " [read more]"}
-		for i := 0; i < b.N; i++ {
-			SmartTrim(text, 50, opts)
-		}
-	})
-
-	b.Run("FunctionalOptions", func(b *testing.B) {
-		for i := 0; i < b.N; i++ {
-			SmartTrim(text, 50, nil, WithSuffix(" [read more]"), WithPreserveWholeWords(false))
-		}
-	})
-
-	// Benchmark different string lengths
-	inputs := []struct {
-		name string
-		text string
-		max  int
-	}{
-		{"Short", "Hello world", 5},
-		{"Medium", text, 50},
-		{"Long", strings.Repeat(text, 10), 100},
-	}
-
-	for _, input := range inputs {
-		b.Run(fmt.Sprintf("Length_%s", input.name), func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
-				SmartTrim(input.text, input.max, nil)
-			}
-		})
 	}
 }
