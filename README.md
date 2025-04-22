@@ -2,10 +2,11 @@
 
 A lightweight Go utility library for intelligently trimming text strings. This library provides an easy way to trim text to specified lengths while either preserving whole words or cutting mid-word as needed. It also handles punctuation appropriately. Perfect for summaries, previews, and UI components where clean text presentation matters.
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/vaidehimani/gotextrim)](https://goreportcard.com/report/github.com/vaidehimani/gotextrim)
+[![Go Report Card](https://goreportcard.com/badge/github.com/vaidehimani/gotextrim?v=1)](https://goreportcard.com/report/github.com/vaidehimani/gotextrim)
 [![GoDoc](https://godoc.org/github.com/vaidehimani/gotextrim?status.svg)](https://godoc.org/github.com/vaidehimani/gotextrim)
 [![license](https://img.shields.io/github/license/vaidehimani/gotextrim)](LICENSE)
 [![Build Status](https://github.com/vaidehimani/gotextrim/workflows/CI/badge.svg)](https://github.com/vaidehimani/gotextrim/actions)
+[![codecov](https://codecov.io/gh/vaidehimani/gotextrim/branch/main/graph/badge.svg)](https://codecov.io/gh/vaidehimani/gotextrim)
 
 ## ⚡ Installation
 

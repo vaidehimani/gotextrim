@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
   pull_request:
-    branches: [main]
+    branches: [ main ]
 
 jobs:
   build:
@@ -12,22 +12,30 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        go-version: ["1.24"]
+        go-version: ['1.18', '1.19', '1.20', '1.21']
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3.5.3
+    - name: Checkout
+      uses: actions/checkout@v3
 
-      - name: Set up Go ${{ matrix.go-version }}
-        uses: actions/setup-go@v5
-        with:
-          go-version: ${{ matrix.go-version }}
+    - name: Set up Go ${{ matrix.go-version }}
+      uses: actions/setup-go@v5
+      with:
+        go-version: ${{ matrix.go-version }}
 
-      - name: Get dependencies
-        run: go mod tidy
+    - name: Get dependencies
+      run: go mod tidy
 
-      - name: Build
-        run: go build -v ./...
+    - name: Build
+      run: go build -v ./...
 
-      - name: Test
-        run: go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
+    - name: Test with coverage
+      run: go test -race -coverprofile=coverage.txt -covermode=atomic ./...
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.txt
+        flags: unittests
+        fail_ci_if_error: true
+        token: ${{ secrets.CODECOV_TOKEN }}
