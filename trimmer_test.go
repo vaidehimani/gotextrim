@@ -179,6 +179,13 @@ func TestSmartTrim(t *testing.T) {
 			},
 			expected: "...",
 		},
+		{
+			name:     "maxLength is zero",
+			text:     "Something",
+			maxLen:   0,
+			options:  nil,
+			expected: "",
+		},
 	}
 
 	for _, tt := range tests {
@@ -206,6 +213,13 @@ func TestFunctionalOptions(t *testing.T) {
 	expected := "The quick [read more]"
 	if result != expected {
 		t.Errorf("SmartTrim with functional options = %q, want %q", result, expected)
+	}
+
+	textWithPunctuation := "Hello, world!"
+	result = SmartTrim(textWithPunctuation, 10, nil, WithPreservePunctuation(false))
+	expected = "Hello..."
+	if result != expected {
+		t.Errorf("SmartTrim with preserve punctuation functional options = %q, want %q", result, expected)
 	}
 
 	// Test mixing struct options and functional options (functional should override)

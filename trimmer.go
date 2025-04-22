@@ -67,15 +67,11 @@ func resolveOptions(opts *SmartTrimOptions, options ...Option) SmartTrimOptions 
 	return resolvedOpts
 }
 
-func calculateContentLength(maxLength, suffixLen, textLen int) int {
+func calculateContentLength(maxLength, suffixLen int) int {
 	contentLength := maxLength - suffixLen
 
 	if contentLength <= 0 {
 		return 0
-	}
-
-	if contentLength > textLen {
-		return textLen
 	}
 
 	return contentLength
@@ -119,7 +115,7 @@ func SmartTrim(text string, maxLength int, opts *SmartTrimOptions, options ...Op
 
 	resolvedOpts := resolveOptions(opts, options...)
 	suffixLen := len(resolvedOpts.Suffix)
-	contentLength := calculateContentLength(maxLength, suffixLen, textLen)
+	contentLength := calculateContentLength(maxLength, suffixLen)
 
 	if contentLength <= 0 {
 		return handleSmallMaxLength(maxLength, resolvedOpts.Suffix)
