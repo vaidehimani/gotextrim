@@ -48,16 +48,8 @@ func isPunctuation(r rune) bool {
 	}
 }
 
-func SmartTrim(text string, maxLength int, opts *SmartTrimOptions, options ...Option) string {
-	if maxLength < 0 {
-		panic(fmt.Sprintf("SmartTrim: maxLength must be a non-negative integer, got %d", maxLength))
-	}
-
-	textLen := len(text)
-	if textLen <= maxLength {
-		return text
-	}
-
+// resolveOptions combines struct options and functional options
+func resolveOptions(opts *SmartTrimOptions, options ...Option) SmartTrimOptions {
 	resolvedOpts := DefaultOptions()
 
 	if opts != nil {
@@ -72,42 +64,77 @@ func SmartTrim(text string, maxLength int, opts *SmartTrimOptions, options ...Op
 		option(&resolvedOpts)
 	}
 
-	suffixLen := len(resolvedOpts.Suffix)
+	return resolvedOpts
+}
+
+func calculateContentLength(maxLength, suffixLen, textLen int) int {
 	contentLength := maxLength - suffixLen
 
-	// Handle case where maxLength is too small for anything but (part of) the suffix
 	if contentLength <= 0 {
-		if maxLength <= 0 {
-			return ""
-		}
-		return resolvedOpts.Suffix[:maxLength]
+		return 0
 	}
 
-	// Ensure not go out of bounds
 	if contentLength > textLen {
-		contentLength = textLen
+		return textLen
+	}
+
+	return contentLength
+}
+
+func handleSmallMaxLength(maxLength int, suffix string) string {
+	if maxLength <= 0 {
+		return ""
+	}
+	return suffix[:maxLength]
+}
+
+func trimAtWordBoundary(text, trimmedText string, contentLength, textLen int) string {
+	if contentLength < textLen && text[contentLength] != ' ' {
+		lastSpaceIndex := strings.LastIndex(trimmedText, " ")
+		if lastSpaceIndex != -1 {
+			return trimmedText[:lastSpaceIndex]
+		}
+		return ""
+	}
+	return trimmedText
+}
+
+// removes trailing punctuation from text
+func removePunctuation(text string) string {
+	for len(text) > 0 && isPunctuation(rune(text[len(text)-1])) {
+		text = text[:len(text)-1]
+	}
+	return text
+}
+
+func SmartTrim(text string, maxLength int, opts *SmartTrimOptions, options ...Option) string {
+	if maxLength < 0 {
+		panic(fmt.Sprintf("SmartTrim: maxLength must be a non-negative integer, got %d", maxLength))
+	}
+
+	textLen := len(text)
+	if textLen <= maxLength {
+		return text
+	}
+
+	resolvedOpts := resolveOptions(opts, options...)
+	suffixLen := len(resolvedOpts.Suffix)
+	contentLength := calculateContentLength(maxLength, suffixLen, textLen)
+
+	if contentLength <= 0 {
+		return handleSmallMaxLength(maxLength, resolvedOpts.Suffix)
 	}
 
 	trimmedText := text[:contentLength]
 
 	if resolvedOpts.PreserveWholeWords && contentLength < textLen {
-		// Check if we're in the middle of a word
-		if contentLength < textLen && text[contentLength] != ' ' {
-			lastSpaceIndex := strings.LastIndex(trimmedText, " ")
-			if lastSpaceIndex != -1 {
-				trimmedText = trimmedText[:lastSpaceIndex]
-			} else {
-				trimmedText = ""
-			}
-		}
+		trimmedText = trimAtWordBoundary(text, trimmedText, contentLength, textLen)
 	}
 
 	trimmedText = strings.TrimRight(trimmedText, " \t\n\r")
 
 	if !resolvedOpts.PreservePunctuation && len(trimmedText) > 0 {
-		for len(trimmedText) > 0 && isPunctuation(rune(trimmedText[len(trimmedText)-1])) {
-			trimmedText = trimmedText[:len(trimmedText)-1]
-		}
+		trimmedText = removePunctuation(trimmedText)
 	}
 
 	var sb strings.Builder
